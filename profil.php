@@ -1,167 +1,201 @@
 <?php
 session_start();
+//CONNEXION DB
+$db = new PDO('mysql:host=localhost;dbname=moduleconnexion;', 'root','' );
 
-$login = $_SESSION['data'];
-//var_dump($login);
 
-if (isset($_POST['confirmer']))
-{
-    $newlogin = $_POST['newlogin'];
-    $newprenom = $_POST['newprenom'];
-    $newnom = $_POST['newnom'];
-    $newpassword = $_POST['newpassword'];
-    $newpassword2 = $_POST['newpassword2'];
-    $id = $_SESSION['data']['id'];
+// VAR $user_id = ID SESSION EN COURS
+$user_id = $_SESSION['id'];
+$login = $_SESSION['login'];
+echo $user_id;
 
-    if (!empty($newlogin) && !empty($newprenom) && !empty($newnom) && !empty($newpassword) && !empty($newpassword2))
-    {
-        include "lien.php";
+// SI $USER_ID IL Y A , ALORS ON CREER LA REQUÊTE
+if(isset($user_id)){
+    $requete = "SELECT * FROM utilisateurs WHERE id =  $user_id ";
 
-        if ($bdd == true)
-        {
-            $req = mysqli_query($bdd,"UPDATE utilisateurs SET login = '$newlogin', prenom = '$newprenom', nom = '$newnom', password = '$newpassword' WHERE id = $id");
+    //PREPARATION DE LA REQUETE
+    $query = $db->prepare($requete);
+//EXECUTION DE LA REQUETE
+    $query->execute(array($user_id));
+    $resultat = $query ->fetch();
 
-            if ($req == true)
-            {
-                if($newpassword == $newpassword2)
-                {
-//// faire la vérification des mots de passe
+    echo 'Bienvenue ' .  $resultat['login'];
+}
 
-                    $req2 = mysqli_query($bdd, "SELECT * FROM utilisateurs WHERE id = $id");
-                    $result = mysqli_fetch_assoc($req2);
+// SI LA SESSION EST INACTIVE (empty = vide) DIRIGE CONNEXION.PHP
+if(empty($user_id)){
+    header('Location : connexion.php');
+    exit;
+}
 
-                    if ($result == true)
-                    {
-                        $_SESSION['data'] = $result;
-                        header('location: index.php');
 
-                        echo ('modification effectuées'); // ne s'affiche pas :/
-                    }
-                }
+if($login == 'admin' ){
 
-            }
-            else
-            {
-                header("Location: index.php");
-                echo ('Erreur : problème sur la requête');
-            }
-        }
-        else
-        {
-            echo ('Erreur : problème de connexion à la base de données.');
-        }
-    }
+    ?>
+    <button><a href="admin.php"> Espace Admin.</a></button>
+
+    <?php
 }
 
 ?>
 
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE-edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/module.css">
-        <link rel="stylesheet" href="CSS/profil.css">
-        <title>Module de connexion</title>
-    </head>
-<body>
-<header>
-    <div class="hautdepage">
-    <nav class="navbar"
-    <div class="picture">
-        <img src="images/3505254.png">
-    </div>
-    <h1>Profil de <?php echo $login['login'];?><span class="rose">.</span></h1>
-    <div class="titre">
-    <ul class="menu">
+
+
+
+
+
+
 <?php
-if(isset($_SESSION['data']))
-{
+
+
+
+$requete = "SELECT u.password FROM utilisateurs AS u WHERE id = ?";
+$query = $db->prepare($requete);
+$query->execute(array($user_id));
+$passwordVerif = $query->rowCount();
+
+$requete = "SELECT login FROM utilisateurs ";
+$query = $db->prepare($requete);
+$query->execute();
+$login_existant = $query->fetchAll();
+
+
+
+
+
+
+
+
+
+    if(isset($_SESSION['id'])){
+    var_dump($_SESSION['id']);
+
     ?>
-    <h2><?php echo "Vous êtes connecter"?></h2>
-    <button class="droite"><a href="deconnexion.php">Se déconnecter</a></button>
-    </ul>
-    </div>
-    </nav>
-    </div>
-    </header>
-    <tbody>
-    <section class="partitrois">
-        <h4>
-            Modification du Profil
-        </h4>
-    </section>
-    <div class="profils">
-        <form action="profil.php" method="post">
-            <table>
-                <tr>
-                    <td align="right">
-                        <label for="login">Login :</label>
-                    </td>
-                    <td>
-                        <input type="text" name="newlogin"  value="<?php echo $login['login']?>">
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">
-                        <label for="prenom">Prénom :</label>
-                    </td>
-                    <td>
-                        <input type="text" name="newprenom"  value="<?php echo $login['prenom']?>">
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">
-                        <label for="nom">Nom :</label>
-                    </td>
-                    <td>
-                        <input type="text" name="newnom"  value="<?php echo $login['nom']?>">
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">
-                        <label for="password">Mot de passe :</label>
-                    </td>
-                    <td>
-                        <input type="password" name="newpassword" placeholder="Confirmer mot de passe">
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">
-                        <label for="password2">Confirmez :</label>
-                    </td>
-                    <td>
-                        <input type="password" name="newpassword2" placeholder="Confirme le mot de passe">
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td align="center">
-                        <br/>
-                        <input value="Confirmer" type="submit" name="confirmer">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
-    </div>
+
+    <!DOCTYPE HTML>
+    <html>
+<body>
+
+    <head>
+
+    </head>
+
+<header>
+        <nav class="navbar">
+    <button><a href="index.php">Accueil<a/></button>
+    <button><a href="profil.php">Profil<a/></button>
+    <button><a href="deco.php">Déconnexion<a/></button>
+
     <?php
-}else{
+    }else{
+
     ?>
+
+
+    <button><a href="index.php">Accueil<a/></button>
+    <button><a href="inscription.php">Inscription<a/></button>
+    <button><a href="connexion.php">Connexion<a/></button>
+
     <?php
-    if(isset($erreur))
-    {
-        echo '<font color="red">'.$erreur. "</font>";
     }
+
+
     ?>
+    </nav>
 
-    <footer class="site-footer">
+</header>
 
-        <footer>
+    <body>
 
-    </body>
+
+    <form action="" method="post" style="text-align: center">
+
+        <label for="newlog">Login :</label>
+        <input type="text" name="newlogin" placeholder="<?php echo $resultat['login']?>"<br/>
+
+        <label for="newprenom">Prénom :</label>
+        <input type="text" name="prenom" placeholder="<?php echo $resultat['prenom']?> "
+
+        <label for="newnom">Nom :</label>
+        <input type="text" name="nom" placeholder=" <?php echo $resultat['nom']?> "><br/>
+
+        <label for="password">Mot De Passe Actuel :</label>
+        <input type="password" name="password" placeholder="Mot De Passe">
+
+        <label for="new_pass">Nouveau Mot de Passe :</label>
+        <input type="Rpassword" name="new_password" placeholder="Nouveau Mot De Passe">
+
+        <label for="conf_password">Confirmer Mot de Passe :</label>
+        <input type="password" name="conf_password" placeholder="Confirmer Mot De Passe">
+
+        <button type="submit" name="valider">Valider</button>
+
+    </form>
+
+
+</body>
+<footer>
+
+</footer>
     </html>
-    <?php
-}
+
+
+<?php
+
+
+    if(isset($_POST['valider'])){
+        $newlogin = htmlspecialchars($_POST['newlogin']);
+        $newprenom = htmlspecialchars($_POST['prenom']);
+        $newnom = htmlspecialchars($_POST['nom']);
+        $passnow = htmlspecialchars($_POST['password']);
+        $newpass = htmlspecialchars($_POST['new_password']);
+        $confpass = htmlspecialchars($_POST['conf_password']);
+
+var_dump($login_existant);
+//$login_existant "login éxistant ": "ok ";
+
+        if ($login_existant[0]["login"] != $newlogin  ) { // si le login existe on passe dans ce if
+
+
+
+
+
+    if( !empty($newlogin)  &&  !empty($newprenom)  && !empty($newnom) && !empty($passnow)  && !empty($newpass)  && !empty($confpass)){
+
+
+
+        $db = new PDO('mysql:host=localhost;dbname=moduleconnexion;', 'root','' );
+        $reqUpdate = "UPDATE utilisateurs SET  login =  '" .$newlogin."' , prenom = '".$newprenom."' , nom = '".$newnom. "' , password = '" .$newpass."' WHERE id = '$user_id' "  ;
+
+
+        $query = $db->prepare($reqUpdate);
+
+        //EXECUTION DE LA REQUETE
+        $query->execute();
+        $resultat = $query ->fetch( PDO::FETCH_ASSOC);
+
+
+
+    }
+
+        else if($passwordVerif == 1 &&$newpass == $confpass){
+
+            $requete = "UPDATE utilisateurs SET  password = ? WHERE id = ?";
+            $query = $db->prepare($requete);
+            $query->execute(array($newpass,$user_id));
+
+
+
+        }
+
+
+
+
+
+
+    }else{
+            echo "login existant";
+        }
+    }
+
 ?>

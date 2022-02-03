@@ -1,113 +1,97 @@
 <?php
 session_start();
 
-//on se connecte à la base de données:
-include "src/src.php";
-//var_dump($_SESSION);
+//SI $_POST DIFFERENT DE VIDE ALORS,
+if(!empty($_POST)){
+    // htmlspecialchars
+    $login = htmlspecialchars($_POST['login']);
+    $password = htmlspecialchars($_POST['password']);
 
-if (isset($_POST['validerco'])) {
-    $loginco = htmlspecialchars(trim($_POST['loginco']));
-    $passwordco = htmlspecialchars(trim($_POST['passwordco']));
+    // SELECT (all) * (de) FROM utilisateurs (condition) WHERE  'colonne' login = variables $login et $password
+    $request = "SELECT * FROM utilisateurs WHERE login = '$login' AND password = '$password'";
+    // CONNEXION BDD
+    $db = mysqli_connect("localhost", "root", "", "moduleconnexion");
+    // CREATION REQUETE CONNEXION DB + SELECT *
+    $query = mysqli_query($db,$request);
 
-    if (!empty($loginco) && !empty($passwordco)) {
-        $repLogin = mysqli_query($bdd, "SELECT * FROM utilisateurs WHERE login = '$loginco' AND password= '$passwordco'");
+    // mysqli_fetch_assoc — Récupère une ligne de résultat sous forme de tableau associatif
+    $users = mysqli_fetch_assoc($query);
 
-        $result = mysqli_fetch_assoc($repLogin);
-        $repPassword = $result['password'];
-        var_dump($result);
-        if(count($result) !=0 )
-        {
-            if ($loginco == 'admin' && $passwordco == 'admin')
-            {
-                $_SESSION['data'] = $result;
-                header("Location: admin.php");
-            }
-            else {
-                $_SESSION['data'] = $result;
-                header("Location: profil.php");
-            }
-        }
-        else
-        {
-            $erreur = "Login ou password incorrect ou incomplet";
-        }
+    // Si, tant que, dans le tableau assoc, l'id de session = id du tableau assoc
+    if(isset($users)){
+        $_SESSION['id'] = $users['id'];
+        $_SESSION['login'] = $users['login'];
+        $_SESSION['prenom'] = $users['prenom'];
+
+
+
+
+        //Alors redirection vers
+        header('location: index.php');
+    }
+    // Si $login & $password strictement = 'admin'
+    if($login == 'admin' && $password =='admin'){
+        header('location: admin.php');
+    }
+// Sinon afficher :
+    else{
+        echo 'Indentifiant ou mot de pass incorrect.';
     }
 }
+// Si la $_SESSION est différent de vide (si quelqu'un est connecté) redirection vers son profil
+if(!empty($_SESSION['id'])){
+    header('location: profil.php');
+}
+
+
+
+
+
+
+// CREATION DE LA REQUETE QUI ENTRE LES INFOS EN BDD
+
 ?>
-<!DOCTYPE html>
-<html lang="fr">
+
+<!DOCTYPE HTML>
+<html>
+
+
 <head>
-    <title>Module de connexion</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE-edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/module.css">
-    <link rel="stylesheet" href="CSS/connexion.css">
+
 </head>
-<body>
+
 <header>
-    <div class="hautdepage">
-        <nav class="navbar">
-            <div class="picture">
-                <img src="images/3505254.png">
-            </div>
-            <h1>My Web Site<span class="rose">.</span></h1>
-            <li><a href="index.php">Acceuil</a></li>
-        </nav>
-    </div>
+
+
+
 </header>
-<section class="partideux">
-    <h4>
-        Connexion
-    </h4>
-</section>
-
-<div class="conect">
-    <fieldset>
 
 
-    <form action="connexion.php" method="post">
-        <div class="formul">
-            <table>
-                <tbody >
-                <tr>
-                    <td>
-                        <label for="login">Login :</label>
-                    </td>
-                    <td>
-                        <input type="text" name="loginco" placeholder="Login" id="login">
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="password">Mot de passe :</label>
-                    </td>
-                    <td>
-                        <input type="password" name="passwordco" placeholder="Mot de passe" id="password">
-                    </td>
-                </tr>
+<body>
 
-                <tr>
-                    <td></td>
-                    <td>
-                        <br/>
-                        <input value="Se connecter" type="submit" name="validerco">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </form>
-    </fieldset>
-    <?php
-    if (isset($erreur)) {
-        echo '<font color="red">' . $erreur . "</font>";
-    }
-    ?>
-</div>
 
-<footer class="site-footer">
 
-    <footer>
+<form action="connexion.php" method="POST">
+
+            <h1>Connexion</h1>
+
+    <label for="login">Login :</label>
+    <input type="text" name="login">
+
+    <label for="mdp">Password :</label>
+    <input type="password" name="password">
+
+    <button type="submit" name="boutton">Connexion</button>
+
+
+</form>
+
+</body>
+
+<footer>
+    Copyright all rights reserved.
+</footer>
+
+
 </body>
 </html>

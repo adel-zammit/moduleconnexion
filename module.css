@@ -1,0 +1,96 @@
+html,body{
+    background: #ccecfc;
+    font-family: Calibri;
+
+}
+
+header{
+    height: 25px;
+   margin: 20px;
+   text-align: center;
+}
+
+.navbar{
+    background: #3578f3;
+
+
+}
+
+li{
+    display: flex;
+    list-style: none;
+
+}
+
+li a{
+   color: white;
+    text-decoration: none;
+
+}
+li a:hover{
+    background: #9cd2fa;
+    color: red;
+}
+
+ul{
+
+    list-style: none;
+    display: flex;
+    justify-content:space-around;
+
+}
+
+
+h1{
+    color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+h2{
+    color: cornflowerblue;
+    display: flex;
+    justify-content: center;
+}
+
+
+.formulaire{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    background: cornflowerblue;
+    margin: 5px;
+    color: white;
+
+
+}
+
+input{
+    display: flex;
+    justify-content: center;
+
+}
+
+button{
+    margin-top: 4px;
+}
+
+table{
+    display: flex;
+    justify-content: center;
+    border: 1px solid;
+    margin-top: 15%;
+}
+
+footer{
+    top: 5%;
+    text-align: center;
+    background: azure ;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 300px;
+    
+}
+
